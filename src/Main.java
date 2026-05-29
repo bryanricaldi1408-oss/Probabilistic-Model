@@ -1,5 +1,4 @@
 import indexing.Document;
-import indexing.IndexBuilder;
 import indexing.InvertedIndex;
 import retrieval.BIMModel;
 import retrieval.SearchResult;
@@ -13,46 +12,44 @@ public class Main {
     public static void main(String[] args) {
 
         // path dataset
-        String datasetPath ="../dataset/Cranfield";
+        String datasetPath = "../dataset/Cranfield";
 
         // load documents
-        FileLoader loader =new FileLoader();
+        FileLoader loader = new FileLoader();
 
         List<Document> documents = loader.loadDocuments(datasetPath);
 
-        System.out.println("Documents loaded: "+ documents.size());
+        System.out.println("Documents loaded: " + documents.size());
 
         // build index
-        IndexBuilder builder =new IndexBuilder();
+        InvertedIndex index = new InvertedIndex();
 
-        InvertedIndex index =builder.buildIndex(documents);
+        index.build(documents);
 
         System.out.println("Vocabulary size: " + index.getIndex().size());
 
         System.out.println(
                 "Average document length: "
                         + String.format(
-                        "%.2f",
-                        index.getAverageDocumentLength()
-                )
-        );
+                                "%.2f",
+                                index.getAverageDocumentLength()));
 
         // initialize BIM
-        BIMModel bim =new BIMModel(index);
+        BIMModel bim = new BIMModel(index);
 
-        Scanner scanner =new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 
         while (true) {
 
-            System.out.print("\nQuery: " );
+            System.out.print("\nQuery: ");
 
-            String query =scanner.nextLine();
+            String query = scanner.nextLine();
 
             if (query.equalsIgnoreCase("exit")) {
                 break;
             }
 
-            List<SearchResult> results =bim.search(query);
+            List<SearchResult> results = bim.search(query);
 
             System.out.println("\n=== Top Results ===");
 
@@ -61,10 +58,10 @@ public class Main {
                 continue;
             }
 
-            int limit =Math.min(10,results.size());
+            int limit = Math.min(10, results.size());
 
-            for (int i = 0;i < limit; i++) {
-                System.out.println((i + 1)+ ". "+ results.get(i));
+            for (int i = 0; i < limit; i++) {
+                System.out.println((i + 1) + ". " + results.get(i));
             }
         }
 
