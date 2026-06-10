@@ -3,8 +3,7 @@ import indexing.InvertedIndex;
 import retrieval.BIMModel;
 import retrieval.SearchResult;
 import utils.FileLoader;
-import utils.QueryLoader;
-import utils.RelevanceLoader;
+
 
 import java.util.List;
 import java.util.Map;
@@ -31,21 +30,11 @@ public class Main {
 
         System.out.println("Average document length: " + String.format("%.2f", index.getAverageDocumentLength()));
 
-        // Load queries
-        QueryLoader queryLoader = new QueryLoader();
-        queryLoader.loadQueries("../cran/cran.qry");
-
-        System.out.println("Queries loaded.");
-
-        // Load relevance judgement
-        RelevanceLoader relevanceLoader = new RelevanceLoader();
-
-        Map<Integer, Set<Integer>> relevanceMap = relevanceLoader.loadRelevance("../cran/cranqrel");
 
         System.out.println("Relevance data loaded.");
 
         // Initialize BIM
-        BIMModel bim = new BIMModel(index, relevanceMap);
+        BIMModel bim = new BIMModel(index);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -57,24 +46,36 @@ public class Main {
                 break;
             }
 
-            // Auto match query
-            int matchedQueryId = queryLoader.findMostSimilarQuery(query);
+            /*
+             * Tahap 1
+             * Initial Retrieval
+             */
+            List<SearchResult> initialResults =bim.searchInitial(query);
 
-            System.out.println("Matched Cranfield Query ID: " + matchedQueryId);
+            /*
+             * Top 5 dianggap relevan
+             */
+            Set<Integer> pseudoRelevantDocs =bim.getPseudoRelevantDocs(initialResults, 5);
 
-            List<SearchResult> results = bim.search(matchedQueryId, query);
+            //System.out.println("\nPseudo Relevant Docs:");
+            /*
+            for (Integer docId :pseudoRelevantDocs) {
+                System.out.println("Doc " + docId);
+            }*/
+
+            List<SearchResult> finalResults =bim.search(query,pseudoRelevantDocs);
 
             System.out.println("\n=== Top Results ===");
 
-            if (results.isEmpty()) {
+            if (finalResults.isEmpty()) {
                 System.out.println("No matching documents found.");
                 continue;
             }
 
-            int limit = Math.min(10, results.size());
+            int limit = Math.min(10, finalResults.size());
 
             for (int i = 0; i < limit; i++) {
-                System.out.println((i + 1) + ". " + results.get(i));
+                System.out.println((i + 1) + ". " + finalResults.get(i));
             }
         }
 
