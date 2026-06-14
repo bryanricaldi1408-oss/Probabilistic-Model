@@ -1,6 +1,11 @@
 # Probabilistic Information Retrieval Model
 
-Proyek ini mengimplementasikan berbagai model pencarian informasi probabilistik menggunakan dataset Cranfield.
+Proyek ini mengimplementasikan berbagai model pencarian informasi probabilistik menggunakan dataset Cranfield.  
+
+Anggota Kelompok:
+- **6182301013 - Bryan Ricaldi Chandra**
+- **6182301080 - Robert Saputra**
+- **6182301094 - Bima Rahmadani Arifandi**  
 
 ## Model yang Tersedia
 
@@ -36,6 +41,24 @@ Ikuti langkah-langkah berikut untuk mengompilasi dan menjalankan program melalui
 
 - **Pilih Model**: Saat program dimulai, pilih model (1, 2, atau 3).
 - **Konfigurasi BM25**: Jika memilih BM25, Anda akan diminta memasukkan nilai $k_1$ (default 1.2) dan $b$ (default 0.75). Tekan **Enter** untuk menggunakan nilai default.
-- **Masukkan Query**: Ketik query Anda (misalnya: "what similarity laws..."). Program akan otomatis mencocokkan query Anda dengan query terdekat dalam dataset Cranfield.
+- **Masukkan Query**: Ketik query Anda (misalnya: "what similarity laws..."). Program akan otomatis mencocokkan query Anda dengan query terdekat dalam dataset Cranfield. Setelah hasil pencarian ditampilkan, **evaluasi otomatis** akan dijalankan.
+- **Mode Evaluasi**: Ketik `eval` untuk masuk ke mode evaluasi:
+  - **Opsi 1**: Evaluasi satu query — masukkan query dan lihat detail evaluasinya.
+  - **Opsi 2**: Evaluasi seluruh query Cranfield — menghitung MAP dan rata-rata metrik seluruh query.
 - **Ganti Model**: Ketik `switch` saat diminta query untuk mengganti model yang digunakan.
 - **Keluar**: Ketik `exit` untuk menghentikan program.
+
+## Metrik Evaluasi
+
+Program ini mengimplementasikan metrik evaluasi Information Retrieval berikut:
+
+| Metrik | Deskripsi |
+|---|---|
+| **Precision** | Proporsi dokumen relevan dari seluruh dokumen yang di-retrieve |
+| **Recall** | Proporsi dokumen relevan yang berhasil di-retrieve dari seluruh dokumen relevan |
+| **F1-Score** | Harmonic mean dari Precision dan Recall |
+| **Precision@K** | Precision pada K dokumen teratas (K = 1, 3, 5, 10, 20) |
+| **Average Precision (AP)** | Rata-rata precision pada setiap posisi dokumen relevan ditemukan |
+| **11-Point Interpolated Avg Precision** | Interpolated precision pada 11 recall level standar (0.0 – 1.0) |
+| **Mean Average Precision (MAP)** | Rata-rata AP seluruh query (pada evaluasi batch) |
+

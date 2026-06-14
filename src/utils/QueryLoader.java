@@ -15,12 +15,14 @@ import java.util.Map;
 public class QueryLoader {
 
     private final Map<Integer, List<String>> queryMap;
+    private final Map<Integer, String> rawQueryMap;
     private final Tokenizer tokenizer;
     private final StopwordRemover stopwordRemover;
     private final PorterStemmer stemmer;
 
     public QueryLoader() {
         this.queryMap = new HashMap<>();
+        this.rawQueryMap = new HashMap<>();
         this.tokenizer = new Tokenizer();
         this.stopwordRemover = new StopwordRemover();
         this.stemmer = new PorterStemmer();
@@ -36,7 +38,9 @@ public class QueryLoader {
                 line = line.trim();
                 if (line.startsWith(".I")) {
                     if (currentId != -1) {
-                        queryMap.put(currentId, preprocess(content.toString()));
+                        String rawText = content.toString().trim();
+                        queryMap.put(currentId, preprocess(rawText));
+                        rawQueryMap.put(currentId, rawText);
                     }
                     currentId = Integer.parseInt(line.substring(2).trim());
                     content = new StringBuilder();
@@ -48,12 +52,21 @@ public class QueryLoader {
             }
 
             if (currentId != -1) {
-                queryMap.put(currentId, preprocess(content.toString()));
+                String rawText = content.toString().trim();
+                queryMap.put(currentId, preprocess(rawText));
+                rawQueryMap.put(currentId, rawText);
             }
         } catch (IOException e) {
             System.out.println("Error loading queries: " + e.getMessage());
         }
         return queryMap;
+    }
+
+    /**
+     * Mengembalikan map dari queryId ke raw query text (belum di-preprocess).
+     */
+    public Map<Integer, String> getRawQueries() {
+        return rawQueryMap;
     }
 
     public int findMostSimilarQuery(String inputQuery) {
