@@ -19,13 +19,15 @@ public class TwoPoisson {
     private final Tokenizer tokenizer;
     private final StopwordRemover stopwordRemover;
     private final PorterStemmer stemmer;
+    private final double k;
     
-    public TwoPoisson(InvertedIndex index, Map<Integer, Set<Integer>> relevanceMap){
+    public TwoPoisson(InvertedIndex index, Map<Integer, Set<Integer>> relevanceMap, double k){
         this.index = index;
         this.relevanceMap = relevanceMap;
         this.tokenizer = new Tokenizer();
         this.stopwordRemover = new StopwordRemover();
         this.stemmer = new PorterStemmer();
+        this.k = k;
     }
     
     public List<SearchResult> search(int queryId, String query){
@@ -40,8 +42,6 @@ public class TwoPoisson {
             Map<Integer, Integer> retrievePostings = index.getPostingList(term);
             int Nt = index.getDF(term);
             int rt = calculateRt(term, relevantDocs);
-            
-            double k = 1.5;
             
             // Formula wt based on RSJ weight
             double wt;

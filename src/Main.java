@@ -45,13 +45,10 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        // Configurable Parameters for BM25
+        // Configurable Parameters
         double k1 = 1.2;
         double b = 0.75;
-
-        // Initialize Models
-        BIMModel bim = new BIMModel(index, relevanceMap);
-        TwoPoisson tp = new TwoPoisson(index, relevanceMap);
+        double kTwoPoisson = 1.5;
 
         // Initialize Evaluator
         Evaluator evaluator = new Evaluator();
@@ -67,7 +64,17 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Invalid input, defaulting to BM25.");
         }
-        if (choice == 3) {
+
+        if (choice == 2) {
+            System.out.print("Enter k for Two-Poisson (default 1.5): ");
+            try {
+                String input = scanner.nextLine();
+                if (!input.isEmpty())
+                    kTwoPoisson = Double.parseDouble(input);
+            } catch (Exception e) {
+                System.out.println("Invalid k, using default.");
+            }
+        } else if (choice == 3) {
             System.out.print("Enter k1 (default 1.2): ");
             try {
                 String input = scanner.nextLine();
@@ -87,6 +94,9 @@ public class Main {
             }
         }
 
+        // Initialize Models
+        BIMModel bim = new BIMModel(index, relevanceMap);
+        TwoPoisson tp = new TwoPoisson(index, relevanceMap, kTwoPoisson);
         BM25 bm25 = new BM25(index, relevanceMap, k1, b);
 
         while (true) {
@@ -119,7 +129,17 @@ public class Main {
                     continue;
                 }
 
-                if (choice == 3) {
+                if (choice == 2) {
+                    System.out.print("Enter k for Two-Poisson (default 1.5): ");
+                    try {
+                        String input = scanner.nextLine();
+                        if (!input.isEmpty())
+                            kTwoPoisson = Double.parseDouble(input);
+                    } catch (Exception e) {
+                        System.out.println("Invalid k, using default.");
+                    }
+                    tp = new TwoPoisson(index, relevanceMap, kTwoPoisson);
+                } else if (choice == 3) {
                     System.out.print("Enter k1 (default 1.2): ");
                     try {
                         String input = scanner.nextLine();
