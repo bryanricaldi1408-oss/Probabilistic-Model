@@ -4,15 +4,19 @@ import retrieval.BIMModel;
 import retrieval.TwoPoisson;
 import retrieval.BM25;
 import retrieval.SearchResult;
+import evaluation.Evaluator;
 import utils.FileLoader;
 import utils.QueryLoader;
 import utils.RelevanceLoader;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Collections;
 
 public class Main {
 
@@ -49,6 +53,9 @@ public class Main {
         BIMModel bim = new BIMModel(index);
         TwoPoisson tp = new TwoPoisson(index, relevanceMap);
         
+        // Initialize Evaluator
+        Evaluator evaluator = new Evaluator();
+
         int choice = 3; // Default to BM25
         System.out.println("\nSelect Model:");
         System.out.println("1. BIM Model");
@@ -83,7 +90,7 @@ public class Main {
             else if (choice == 2) modelName = "Two-Poisson";
             else modelName = "BM25";
 
-            System.out.print("\n[" + modelName + "] Query (type 'switch' to change model, 'exit' to quit): ");
+            System.out.print("\n[" + modelName + "] Query (type 'switch' to change model, 'eval' for evaluation, 'exit' to quit): ");
             String query = scanner.nextLine();
             
             if (query.equalsIgnoreCase("exit")) {
@@ -121,6 +128,72 @@ public class Main {
                 continue;
             }
 
+            // ========================
+            // EVALUASI
+            // ========================
+            if (query.equalsIgnoreCase("eval")) {
+                System.out.println("\n=== Mode Evaluasi ===");
+                System.out.println("1. Evaluasi satu query (masukkan query)");
+                System.out.println("2. Evaluasi seluruh query Cranfield (MAP + 11-Point Avg)");
+                System.out.print("Pilihan (1/2): ");
+                
+                String evalChoice = scanner.nextLine().trim();
+                
+                if (evalChoice.equals("1")) {
+                    System.out.print("Masukkan query: ");
+                    String evalQuery = scanner.nextLine();
+                    
+                    int matchedQueryId = queryLoader.findMostSimilarQuery(evalQuery);
+                    System.out.println("Matched Cranfield Query ID: " + matchedQueryId);
+                    
+                    List<SearchResult> results;
+                    if (choice == 1) {
+                        Set<Integer> relevantDocs = relevanceMap.getOrDefault(matchedQueryId, new HashSet<>());
+                        results = bim.search(evalQuery, relevantDocs);
+                    } else if (choice == 2) {
+                        results = tp.search(matchedQueryId, evalQuery);
+                    } else {
+                        results = bm25.search(matchedQueryId, evalQuery);
+                    }
+                    
+                    Set<Integer> relevantDocs = relevanceMap.getOrDefault(matchedQueryId, new HashSet<>());
+                    evaluator.evaluateSingleQuery(results, relevantDocs, matchedQueryId);
+                    
+                } else if (evalChoice.equals("2")) {
+                    System.out.println("\nMenjalankan evaluasi pada seluruh query Cranfield...");
+                    System.out.println("Model: " + modelName);
+                    System.out.println("Mohon tunggu...\n");
+                    
+                    Map<Integer, String> rawQueries = queryLoader.getRawQueries();
+                    Map<Integer, List<SearchResult>> allResults = new HashMap<>();
+                    
+                    List<Integer> queryIds = new ArrayList<>(rawQueries.keySet());
+                    Collections.sort(queryIds);
+                    
+                    for (int qId : queryIds) {
+                        String qText = rawQueries.get(qId);
+                        
+                        List<SearchResult> results;
+                        if (choice == 1) {
+                            Set<Integer> relevantDocs = relevanceMap.getOrDefault(qId, new HashSet<>());
+                            results = bim.search(qText, relevantDocs);
+                        } else if (choice == 2) {
+                            results = tp.search(qId, qText);
+                        } else {
+                            results = bm25.search(qId, qText);
+                        }
+                        
+                        allResults.put(qId, results);
+                    }
+                    
+                    evaluator.evaluateAll(allResults, relevanceMap);
+                    
+                } else {
+                    System.out.println("Pilihan tidak valid.");
+                }
+                continue;
+            }
+
             // Auto match query
             int matchedQueryId = queryLoader.findMostSimilarQuery(query);
             System.out.println("Matched Cranfield Query ID: " + matchedQueryId);
@@ -144,6 +217,12 @@ public class Main {
             int limit = Math.min(10, results.size());
             for (int i = 0; i < limit; i++) {
                 System.out.println((i + 1) + ". " + results.get(i));
+            }
+
+            // Tampilkan evaluasi otomatis setelah hasil pencarian
+            Set<Integer> relevantDocs = relevanceMap.getOrDefault(matchedQueryId, new HashSet<>());
+            if (!relevantDocs.isEmpty()) {
+                evaluator.evaluateSingleQuery(results, relevantDocs, matchedQueryId);
             }
         }
 
