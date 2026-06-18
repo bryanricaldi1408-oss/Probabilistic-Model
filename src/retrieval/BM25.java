@@ -1,13 +1,12 @@
 package retrieval;
 
+import indexing.InvertedIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import indexing.InvertedIndex;
 import preprocessing.PorterStemmer;
 import preprocessing.StopwordRemover;
 import preprocessing.Tokenizer;

@@ -1,22 +1,22 @@
+import evaluation.Evaluator;
 import indexing.Document;
 import indexing.InvertedIndex;
-import retrieval.BIMModel;
-import retrieval.TwoPoisson;
-import retrieval.BM25;
-import retrieval.SearchResult;
-import evaluation.Evaluator;
-import utils.FileLoader;
-import utils.QueryLoader;
-import utils.RelevanceLoader;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Collections;
+import retrieval.BIMModel;
+import retrieval.BM10;
+import retrieval.BM25;
+import retrieval.SearchResult;
+import retrieval.TwoPoisson;
+import utils.FileLoader;
+import utils.QueryLoader;
+import utils.RelevanceLoader;
 
 public class Main {
 
@@ -58,7 +58,9 @@ public class Main {
         System.out.println("1. BIM Model");
         System.out.println("2. Two-Poisson Model");
         System.out.println("3. BM25 Model");
-        System.out.print("Choice (1/2/3): ");
+        System.out.println("4. BM10 Model");
+
+        System.out.print("Choice (1/2/3/4): ");
         try {
             choice = Integer.parseInt(scanner.nextLine());
         } catch (Exception e) {
@@ -92,19 +94,30 @@ public class Main {
             } catch (Exception e) {
                 System.out.println("Invalid b, using default.");
             }
-        }
+        }else if(choice==4){
+            System.out.print("Enter k1 (default 1.2): ");
+            try {
+                String input = scanner.nextLine();
+                if (!input.isEmpty())
+                    k1 = Double.parseDouble(input);
+            } catch (Exception e) {
+                System.out.println("Invalid k1, using default.");
+            }
+        } 
 
         // Initialize Models
         BIMModel bim = new BIMModel(index, relevanceMap);
         TwoPoisson tp = new TwoPoisson(index, relevanceMap, kTwoPoisson);
         BM25 bm25 = new BM25(index, relevanceMap, k1, b);
-
+        BM10 bm10 = new BM10(index,relevanceMap,k1);
         while (true) {
             String modelName;
             if (choice == 1)
                 modelName = "BIM";
             else if (choice == 2)
                 modelName = "Two-Poisson";
+            else if (choice==4)
+                modelName = "BM10";
             else
                 modelName = "BM25";
 
@@ -121,7 +134,8 @@ public class Main {
                 System.out.println("1. BIM Model");
                 System.out.println("2. Two-Poisson Model");
                 System.out.println("3. BM25 Model");
-                System.out.print("Choice (1/2/3): ");
+                System.out.println("4. BM10 Model");
+                System.out.print("Choice (1/2/3/4): ");
                 try {
                     choice = Integer.parseInt(scanner.nextLine());
                 } catch (Exception e) {
@@ -159,6 +173,15 @@ public class Main {
                     }
 
                     bm25 = new BM25(index, relevanceMap, k1, b);
+                }else if (choice==4){
+                    System.out.print("Enter k1 (default 1.2): ");
+                    try {
+                        String input = scanner.nextLine();
+                        if (!input.isEmpty())
+                            k1 = Double.parseDouble(input);
+                    } catch (Exception e) {
+                        System.out.println("Invalid k1, using default.");
+                    }
                 }
                 continue;
             }
@@ -187,6 +210,8 @@ public class Main {
                         results = bim.search(evalQuery, relevantDocs);
                     } else if (choice == 2) {
                         results = tp.search(matchedQueryId, evalQuery);
+                    }else if (choice == 4) {
+                        results = bm10.search(matchedQueryId, query);
                     } else {
                         results = bm25.search(matchedQueryId, evalQuery);
                     }
