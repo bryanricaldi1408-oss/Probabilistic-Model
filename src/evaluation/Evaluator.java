@@ -1,8 +1,7 @@
 package evaluation;
 
-import retrieval.SearchResult;
-
 import java.util.*;
+import retrieval.SearchResult;
 
 /**
  * Kelas untuk mengevaluasi hasil pencarian Information Retrieval.
@@ -17,7 +16,7 @@ import java.util.*;
 public class Evaluator {
 
     // Nilai K yang digunakan untuk Precision@K
-    private static final int[] K_VALUES = {1, 3, 5, 10, 20};
+    private static final int[] K_VALUES = {1, 3, 5, 10, 20, 25};
 
     // 11 recall levels standar untuk interpolated precision
     private static final double[] RECALL_LEVELS = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
