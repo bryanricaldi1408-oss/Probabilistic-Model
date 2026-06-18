@@ -150,6 +150,7 @@ public class Main {
                         if (!input.isEmpty())
                             kTwoPoisson = Double.parseDouble(input);
                     } catch (Exception e) {
+                        kTwoPoisson = 1.5;
                         System.out.println("Invalid k, using default.");
                     }
                     tp = new TwoPoisson(index, relevanceMap, kTwoPoisson);
@@ -160,6 +161,7 @@ public class Main {
                         if (!input.isEmpty())
                             k1 = Double.parseDouble(input);
                     } catch (Exception e) {
+                        k1 = 1.2;
                         System.out.println("Invalid k1, using default.");
                     }
 
@@ -169,6 +171,7 @@ public class Main {
                         if (!input.isEmpty())
                             b = Double.parseDouble(input);
                     } catch (Exception e) {
+                        b = 0.75;
                         System.out.println("Invalid b, using default.");
                     }
 
@@ -180,8 +183,10 @@ public class Main {
                         if (!input.isEmpty())
                             k1 = Double.parseDouble(input);
                     } catch (Exception e) {
+                        k1 = 1.2;
                         System.out.println("Invalid k1, using default.");
                     }
+                    bm10 = new BM10(index, relevanceMap, k1);
                 }
                 continue;
             }
@@ -239,6 +244,8 @@ public class Main {
                             results = bim.search(qText, relevantDocs);
                         } else if (choice == 2) {
                             results = tp.search(qId, qText);
+                        } else if (choice == 4) {
+                            results = bm10.search(qId, qText);
                         } else {
                             results = bm25.search(qId, qText);
                         }
@@ -264,7 +271,9 @@ public class Main {
                 results = bim.search(query,relevantDocs);
             } else if (choice == 2) {
                 results = tp.search(matchedQueryId, query);
-            } else {
+            } else if (choice == 4) {
+                results = bm10.search(matchedQueryId, query);
+            }else {
                 results = bm25.search(matchedQueryId, query);
             }
 
