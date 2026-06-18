@@ -12,7 +12,7 @@ Anggota Kelompok:
 1.  **BIM (Binary Independent Model)**: Model dasar yang menggunakan bobot probabilitas berdasarkan kemunculan term dalam dokumen relevan dan non-relevan.
 2.  **Two-Poisson Model**: Model yang mempertimbangkan distribusi frekuensi term menggunakan dua distribusi Poisson. Menggunakan rumus bobot RSJ (Robertson-Sparck Jones).
 3.  **BM25 (Best Matching 25)**: Model probabilistik modern yang menyempurnakan Two-Poisson dengan mempertimbangkan saturasi frekuensi term ($k_1$) dan normalisasi panjang dokumen ($b$).
-4.  **BM10 (Best Matching 10)**: predecessor dari model B25 sebelum implementasi variabel ($b)
+4.  **BM11 (Best Matching 10)**: predecessor dari model B25 sebelum implementasi variabel b
 
 ## Prasyarat
 
